@@ -19,6 +19,12 @@ fi
 
 echo "Pushing HEAD to GitLab ref: ${GITLAB_REF}"
 
+# Unshallow the repository if it's a shallow clone
+if git rev-parse --is-shallow-repository 2>/dev/null | grep -q "true"; then
+  echo "Detected shallow clone, unshallowing..."
+  git fetch --unshallow
+fi
+
 PUSH_ARGS=(-o ci.skip "${GIT_REMOTE_NAME}" "HEAD:${GITLAB_REF}")
 
 if [[ "${FORCE_PUSH}" == "true" ]]; then
