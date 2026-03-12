@@ -25,7 +25,7 @@
 ## 輸入參數
 
 | 輸入參數 | 必填 | 預設值 | 說明 |
-|---------|------|--------|------|
+|----------|------|--------|------|
 | `gitlab_push_host` | 是 | - | GitLab 主機位址（不含協定，例如：`gitlab.example.com`） |
 | `gitlab_project_path` | 是 | - | GitLab 專案路徑（例如：`namespace/project-name`） |
 | `gitlab_project_id` | 是 | - | GitLab 數值專案 ID |
@@ -43,7 +43,7 @@
 ## 輸出
 
 | 輸出參數 | 說明 |
-|---------|------|
+|----------|------|
 | `pipeline_id` | 觸發的 GitLab Pipeline ID |
 | `pipeline_status` | GitLab Pipeline 最終狀態（`success`、`failed`、`canceled`、`skipped` 等） |
 | `pipeline_web_url` | GitLab Pipeline 網頁網址 |
@@ -56,7 +56,7 @@
 
 ```yaml
 - name: Sync to GitLab
-  uses: ./gitlab-sync-action
+  uses: royfw/gitlab-sync-action@v1
   with:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
@@ -73,7 +73,7 @@
 
 ```yaml
 - name: Sync to GitLab and Wait
-  uses: ./gitlab-sync-action
+  uses: royfw/gitlab-sync-action@v1
   with:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
@@ -108,7 +108,7 @@ jobs:
 
       - name: Sync to GitLab
         id: sync
-        uses: ./gitlab-sync-action
+        uses: royfw/gitlab-sync-action@v1
         with:
           gitlab_push_host: gitlab.example.com
           gitlab_project_path: my-namespace/my-project

@@ -56,7 +56,7 @@ Push code to GitLab without triggering a pipeline:
 
 ```yaml
 - name: Sync to GitLab
-  uses: ./gitlab-sync-action
+  uses: royfw/gitlab-sync-action@v1
   with:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
@@ -73,7 +73,7 @@ Push code, trigger pipeline, and wait for completion:
 
 ```yaml
 - name: Sync to GitLab and Wait
-  uses: ./gitlab-sync-action
+  uses: royfw/gitlab-sync-action@v1
   with:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
@@ -108,7 +108,7 @@ jobs:
 
       - name: Sync to GitLab
         id: sync
-        uses: ./gitlab-sync-action
+        uses: royfw/gitlab-sync-action@v1
         with:
           gitlab_push_host: gitlab.example.com
           gitlab_project_path: my-namespace/my-project
