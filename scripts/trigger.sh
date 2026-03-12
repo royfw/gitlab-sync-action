@@ -31,8 +31,6 @@ RESPONSE="$(
     "${TRIGGER_URL}"
 )"
 
-echo "${RESPONSE}"
-
 PIPELINE_ID="$(echo "${RESPONSE}" | jq -r '.id')"
 PIPELINE_STATUS="$(echo "${RESPONSE}" | jq -r '.status // empty')"
 PIPELINE_WEB_URL="$(echo "${RESPONSE}" | jq -r '.web_url // empty')"

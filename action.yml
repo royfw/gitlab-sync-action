@@ -64,6 +64,12 @@ outputs:
   pipeline_id:
     description: Triggered GitLab pipeline ID
     value: ${{ steps.trigger.outputs.pipeline_id }}
+  pipeline_status:
+    description: GitLab pipeline final status
+    value: ${{ steps.wait.outputs.pipeline_status }}
+  pipeline_web_url:
+    description: GitLab pipeline web URL
+    value: ${{ steps.trigger.outputs.pipeline_web_url }}
 
 runs:
   using: composite
@@ -125,3 +131,4 @@ runs:
         GITLAB_API_TOKEN: ${{ inputs.gitlab_api_token }}
         PIPELINE_ID: ${{ steps.trigger.outputs.pipeline_id }}
         POLL_INTERVAL: ${{ inputs.poll_interval }}
+        MAX_POLL_ATTEMPTS: 60

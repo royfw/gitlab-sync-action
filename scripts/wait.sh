@@ -7,13 +7,24 @@ set -euo pipefail
 : "${PIPELINE_ID:?PIPELINE_ID is required}"
 
 POLL_INTERVAL="${POLL_INTERVAL:-10}"
+MAX_POLL_ATTEMPTS="${MAX_POLL_ATTEMPTS:-60}"
 PIPELINE_URL="https://${GITLAB_PUSH_HOST}/api/v4/projects/${GITLAB_PROJECT_ID}/pipelines/${PIPELINE_ID}"
 
 echo "Waiting for GitLab pipeline: ${PIPELINE_ID}"
 echo "Polling URL: ${PIPELINE_URL}"
 echo "Poll interval: ${POLL_INTERVAL}s"
+echo "Max poll attempts: ${MAX_POLL_ATTEMPTS}"
+
+ATTEMPT=0
 
 while true; do
+  ATTEMPT=$((ATTEMPT + 1))
+  
+  if [[ ${ATTEMPT} -gt ${MAX_POLL_ATTEMPTS} ]]; then
+    echo "Error: Max poll attempts (${MAX_POLL_ATTEMPTS}) exceeded" >&2
+    exit 1
+  fi
+  
   RESPONSE="$(
     curl --silent --show-error --fail \
       --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
