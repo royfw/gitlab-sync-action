@@ -1,0 +1,127 @@
+name: GitLab Sync Trigger
+description: Push code to GitLab, optionally trigger pipeline, and optionally wait for result
+
+inputs:
+  gitlab_push_host:
+    description: GitLab host, without protocol.
+    required: true
+
+  gitlab_project_path:
+    description: GitLab project path.
+    required: true
+
+  gitlab_project_id:
+    description: GitLab numeric project ID
+    required: true
+
+  gitlab_ref:
+    description: Target branch or ref in GitLab
+    required: true
+
+  deploy_env:
+    description: Deploy environment passed to GitLab pipeline
+    required: false
+    default: dev
+
+  trigger_pipeline:
+    description: Whether to trigger GitLab pipeline
+    required: false
+    default: "true"
+
+  wait_for_pipeline:
+    description: Whether to wait for GitLab pipeline completion
+    required: false
+    default: "true"
+
+  poll_interval:
+    description: Poll interval in seconds
+    required: false
+    default: "10"
+
+  gitlab_push_token:
+    description: GitLab token with write_repository
+    required: true
+
+  gitlab_trigger_token:
+    description: GitLab pipeline trigger token
+    required: false
+
+  gitlab_api_token:
+    description: GitLab API token for polling pipeline status
+    required: false
+
+  git_remote_name:
+    description: Git remote name for GitLab
+    required: false
+    default: gitlab
+
+  force_push:
+    description: Whether to force push to GitLab
+    required: false
+    default: "true"
+
+outputs:
+  pipeline_id:
+    description: Triggered GitLab pipeline ID
+    value: ${{ steps.trigger.outputs.pipeline_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Validate required tools
+      shell: bash
+      run: |
+        set -euo pipefail
+        command -v git >/dev/null 2>&1 || { echo "git is required"; exit 1; }
+        command -v curl >/dev/null 2>&1 || { echo "curl is required"; exit 1; }
+        command -v jq >/dev/null 2>&1 || { echo "jq is required"; exit 1; }
+
+    - name: Configure git identity
+      shell: bash
+      run: |
+        set -euo pipefail
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+    - name: Push code to GitLab
+      shell: bash
+      run: |
+        set -euo pipefail
+        "${{ github.action_path }}/scripts/push.sh"
+      env:
+        GITLAB_PUSH_HOST: ${{ inputs.gitlab_push_host }}
+        GITLAB_PROJECT_PATH: ${{ inputs.gitlab_project_path }}
+        GITLAB_REF: ${{ inputs.gitlab_ref }}
+        GITLAB_PUSH_TOKEN: ${{ inputs.gitlab_push_token }}
+        GIT_REMOTE_NAME: ${{ inputs.git_remote_name }}
+        FORCE_PUSH: ${{ inputs.force_push }}
+
+    - name: Trigger GitLab pipeline
+      id: trigger
+      if: ${{ inputs.trigger_pipeline == 'true' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        "${{ github.action_path }}/scripts/trigger.sh"
+      env:
+        GITLAB_PUSH_HOST: ${{ inputs.gitlab_push_host }}
+        GITLAB_PROJECT_ID: ${{ inputs.gitlab_project_id }}
+        GITLAB_REF: ${{ inputs.gitlab_ref }}
+        GITLAB_TRIGGER_TOKEN: ${{ inputs.gitlab_trigger_token }}
+        DEPLOY_ENV: ${{ inputs.deploy_env }}
+        SOURCE_REF: ${{ github.ref_name }}
+        SOURCE_SHA: ${{ github.sha }}
+        TRIGGER_SOURCE: github-actions
+
+    - name: Wait for GitLab pipeline
+      if: ${{ inputs.trigger_pipeline == 'true' && inputs.wait_for_pipeline == 'true' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        "${{ github.action_path }}/scripts/wait.sh"
+      env:
+        GITLAB_PUSH_HOST: ${{ inputs.gitlab_push_host }}
+        GITLAB_PROJECT_ID: ${{ inputs.gitlab_project_id }}
+        GITLAB_API_TOKEN: ${{ inputs.gitlab_api_token }}
+        PIPELINE_ID: ${{ steps.trigger.outputs.pipeline_id }}
+        POLL_INTERVAL: ${{ inputs.poll_interval }}
