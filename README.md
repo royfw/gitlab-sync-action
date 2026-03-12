@@ -61,7 +61,7 @@ Push code to GitLab without triggering a pipeline:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
     gitlab_project_id: "12345"
-    gitlab_ref: main
+    gitlab_ref: ${{ github.ref_name }}
     gitlab_push_token: ${{ secrets.GITLAB_PUSH_TOKEN }}
     trigger_pipeline: false
     wait_for_pipeline: false
@@ -78,7 +78,7 @@ Push code, trigger pipeline, and wait for completion:
     gitlab_push_host: gitlab.example.com
     gitlab_project_path: my-namespace/my-project
     gitlab_project_id: "12345"
-    gitlab_ref: main
+    gitlab_ref: ${{ github.ref_name }}
     deploy_env: production
     gitlab_push_token: ${{ secrets.GITLAB_PUSH_TOKEN }}
     gitlab_trigger_token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
@@ -113,7 +113,7 @@ jobs:
           gitlab_push_host: gitlab.example.com
           gitlab_project_path: my-namespace/my-project
           gitlab_project_id: "12345"
-          gitlab_ref: main
+          gitlab_ref: ${{ github.ref_name }}
           deploy_env: production
           gitlab_push_token: ${{ secrets.GITLAB_PUSH_TOKEN }}
           gitlab_trigger_token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
